@@ -7,13 +7,14 @@
     "require": {
         "php": "^8.1",
         "bacon/bacon-qr-code": "^2.0",
-        "barryvdh/laravel-dompdf": "^2.1",        
+        "barryvdh/laravel-dompdf": "^2.1",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image": "^3.5",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "milon/barcode": "^11.0",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "zendframework/zend-barcode": "^2.5"
     },
     "require-dev": {

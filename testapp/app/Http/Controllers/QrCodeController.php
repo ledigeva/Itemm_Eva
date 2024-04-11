@@ -3,73 +3,63 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Depots;
+use App\Models\Articles;
+use App\Models\Dispos;
 use Illuminate\Http\Request;
 use BaconQrCode\Encoder\QrCode;
 use BaconQrCode\Common\ErrorCorrectionLevel;
 use BaconQrCode\Common\Mode;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class QrCodeController extends Controller
 {
-    public function affichageqrcode()
+
+    public function obtenirInformation()
     {
-        // Définition de la variable $options
-        $options1 = [
-            '1' => 'catégorie',
-            '2' => 'catégorie',
-            '3' => 'catégorie',
-            '4' => 'catégorie',
-            '5' => 'catégorie',
-            '6' => 'catégorie',
-            '7' => 'catégorie',
-            '8' => 'catégorie',
-            '9' => 'catégorie',
-            '10' => 'catégorie',
-            '11' => 'catégorie',
-            '12' => 'catégorie',
-            '13' => 'catégorie',
-            '14' => 'catégorie',
-            '15' => 'catégorie',
-            '16' => 'catégorie',
-            '17' => 'catégorie',
-            '18' => 'catégorie',
-            '19' => 'catégorie',
-            '20' => 'catégorie',
-            '21' => 'catégorie',
-            '22' => 'catégorie',
-            '23' => 'catégorie',
-            '24' => 'catégorie',
-        ];
-        $options2 = [
-            '1' => 'souscat',
-            '2' => 'souscat',
-            '3' => 'souscat',
-            '4' => 'souscat',
-        ];
-        $options3 = [
-            'catégorie' => 'souscatt',
-            'souscat' => 'souscatt',
-            'souscatt' => 'souscatt',
-            'nom' => 'souscatt',
-        ];$options4 = [
-            'catégorie' => 'nom',
-            'souscat' => 'nom',
-            'souscatt' => 'nom',
-            'nom' => 'nom',
-        ];
-        $options5 = [
-            'catégorie' => 'quantité',
-            'souscat' => 'quantité',
-            'souscatt' => 'quantité',
-            'nom' => 'quantité',
-        ];
+    
+        /*try 
+        {
+            
+            $articles = Articles::all();
+           
+            return view(view: 'qrcode', data: ['articles' => $articles]);
+        }catch (\Exception $e) {
+        //gerer les erreurs
+            return view(view: 'qrcode', data: ['articles' => []])->with(key:'error', value: $e->getMessage());
+        }*/
 
 
-        // Rendre la vue en passant la variable $options
-        return view('barre', ['options1' => $options1,
-        'options2' => $options2,
-        'options3' => $options3,
-        'options4' => $options4]);
+        $articles = DB::table('dispos')
+        ->join('articles', 'dispos.GQ_ARTICLE', '=', 'articles.GA_CODEARTICLE')
+        ->join('depots', 'dispos.GQ_DEPOT', '=', 'depots.GDE_DEPOT')
+        ->get();
+        return view(view: 'qrcode', data: ['articles' => $articles]);
+
+        
     }
 
+    
+    public function pdfqrcode() 
+    {
+    
+        $pdf = Pdf::loadView('pdfqrcode');
+        return $pdf->download();
+
+    }
+
+    public function generateQrCode() 
+    {
+        $image = \QrCode::format('png')
+                 ->size(200)
+                 ->generate('A simple example of QR code!');
+        $output_file = '/img/qr-code/-' . time() . '.png';
+        Storage::disk('public')->put($output_file, $image);
+
+        return 'sucess';
+    }
 }
 

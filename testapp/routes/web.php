@@ -21,7 +21,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/toto',[BlogController::class,'afficher'])->name('toto');
 
 Route::get('genepdf', [PdfBarreController::class, 'generatePdf'])->name('genepdf');
+Route::get('genepdfqrcode', [QrCodeController::class, 'pdfqrcode', 'generateQRCode'])->name('genepdfqrcode');
 Route::get('pdfbarre', [BlogController::class, 'afficher'])->name('pdfbarre');
+//Route::get('generate-qrcode', [QrCodeController::class, 'generateQrCode'])->name('generate-code');
 
 Route::get('/home',function () {
    // return "coucou";
@@ -60,12 +62,10 @@ Route::get('/stocks', function () {
 })->name('stocks');
 
 // generer qr code
-Route::get('/qrcode', function () {
-    return view('qrcode');
-})->name('qrcode');
+Route::get('/qrcode', [QrCodeController::class,"obtenirInformation"])->name('qrcode');
+
 
 // generer code barre
 //Route::get('/barre', function () {
 //    return view('barre');
 //})->name('barre');
-
