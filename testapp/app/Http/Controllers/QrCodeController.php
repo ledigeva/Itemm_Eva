@@ -17,8 +17,21 @@ use Illuminate\Support\Facades\Storage;
 
 class QrCodeController extends Controller
 {
+    public function obtenirLocalisation()
+    {
+        $depots=Depots::all();
+        return $depots;
+    }
 
-    public function obtenirInformation()
+    public function obtenirCategorie()
+    {
+        $cat=Articles::all();
+        return $cat;
+    }
+
+
+
+    public function obtenirInformationTableau(Request $request)
     {
     
         /*try 
@@ -33,14 +46,31 @@ class QrCodeController extends Controller
         }*/
 
 
-        $articles = DB::table('dispos')
+        $query = DB::table('dispos')
         ->join('articles', 'dispos.GQ_ARTICLE', '=', 'articles.GA_CODEARTICLE')
-        ->join('depots', 'dispos.GQ_DEPOT', '=', 'depots.GDE_DEPOT')
-        ->get();
-        return view(view: 'qrcode', data: ['articles' => $articles]);
+        ->join('depots', 'dispos.GQ_DEPOT', '=', 'depots.GDE_DEPOT');
 
-        
+    if ($request->filled('satellite')) {
+        $query->where('depots.GDE_LIBELLE', $request->input('satellite'));
     }
+
+    if ($request->filled('categorie')) {
+        $query->where('articles.GA_FAMILLENIV1', $request->input('categorie'));
+    }
+
+    if ($request->filled('sous_categorie1')) {
+        $query->where('articles.GA_FAMILLENIV2', $request->input('sous_categorie1'));
+    }
+
+    if ($request->filled('sous_categorie2')) {
+        $query->where('articles.GA_FAMILLENIV3', $request->input('sous_categorie2'));
+    }
+
+    $articles = $query->get();
+
+    return view('qrcode', data: ['articles' => $articles]);
+}
+
 
     
     public function pdfqrcode() 

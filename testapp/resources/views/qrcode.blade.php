@@ -16,55 +16,55 @@ color: red;
 </style>
 
 <body>
+
 <div class="container">
        <h1>QRCode</h1>
        <!-- Formulaire de filtre -->
        <div class="pourfiltre col-md-12 mb-4 d-flex justify-content-center"> <!-- Added flex class -->
+
+
            <!-- satelllite -->
-           <form action="barre" method="POST" class="col-md-3 border border-dark">
-    @csrf
-    <select name="choix" class="form-select">
-        @foreach($articles->unique('GDE_LIBELLE') as $article)
-            <option value="{{ $article->GDE_LIBELLE }}">{{ $article->GDE_LIBELLE }}</option>
-        @endforeach
-    </select>
-</form>
+           <form id="satelliteForm" action="{{ route('qrcode') }}" method="GET" class="col-md-3 border border-dark">
+             @csrf
+             <select name="satellite" id="satellite" class="form-select">
+             <option value="-1">Sélectionnez une localisation</option>
+             </select>
+           </form>
+
 
            <!-- catégorie -->
-           <form action="barre" method="POST" class="col-md-3 border border-dark">
+           <form id="categorieForm" action="{{ route('qrcode') }}" method="GET" class="col-md-3 border border-dark">
                @csrf
-               <select name="choix" class="form-select">
-               @foreach($articles->unique('GA_FAMILLENIV1') as $article)
-               @if ($article->GA_FAMILLENIV1 !== null && $article->GA_FAMILLENIV1 !== '')
-                    <option value="{{ $article->GA_FAMILLENIV1 }}">{{ $article->GA_FAMILLENIV1 }}</option>  
-                    @endif                 
-                    @endforeach
+               <select name="categorie" id="categorie"class="form-select">
+               <option value="-1">Sélectionnez une Categorie</option>
                </select>
            </form>
+
+
+
+
            <!-- sous-catégorie 1 -->
-           <form action="barre" method="POST" class="col-md-3 border border-dark">
+           <form id="sousCategorie1Form" action="{{ route('qrcode') }}" method="GET" class="col-md-3 border border-dark">
                @csrf
-               <select name="choix" class="form-select">
-               @foreach($articles->unique('GA_FAMILLENIV2') as $article)
-               @if ($article->GA_FAMILLENIV2 !== null && $article->GA_FAMILLENIV2 !== '')
-                    <option value="{{ $article->GA_FAMILLENIV2 }}">{{ $article->GA_FAMILLENIV2 }}</option>
-                    @endif                  
-                     @endforeach
+               <select name="sous_categorie1" id="sous_categorie1"class="form-select">
+               <option value="-1">Sélectionnez une Sous-Categorie 1</option>
                </select>
            </form>
+
+
+
+
            <!-- sous-catégorie 2 -->
-           <form action="barre" method="POST" class="col-md-3 border border-dark">
+           <form id="sousCategorie2Form" action="{{ route('qrcode') }}" method="GET" class="col-md-3 border border-dark">
                @csrf
-               <select name="choix" class="form-select">
-               @foreach($articles->unique('GA_FAMILLENIV3') as $article)
-               @if ($article->GA_FAMILLENIV3 !== null && $article->GA_FAMILLENIV3 !== '')
-                    <option value="{{ $article->GA_FAMILLENIV3 }}">{{ $article->GA_FAMILLENIV3 }}</option> 
-                    @endif                  
-                    @endforeach
+               <select name="sous_categorie2" id="sous_categorie2"class="form-select">
+               <option value="-1">Sélectionnez une Sous-Categorie 2</option>
                </select>
            </form>
        </div>
    </div>
+
+ 
 
 <!-- Tableau dynamique -->
 <div class="container">
@@ -128,11 +128,63 @@ color: red;
 <script>
    // JavaScript pour afficher ou masquer la liste déroulante au clic sur l'image de compte
    $(document).ready(function () {
+
+     // Attend que le document soit entièrement chargé
+     $('select').change(function() {
+        // Sélectionne toutes les listes déroulantes et ajoute un écouteur d'événements change
+        var form = $(this).closest('form'); // Trouve le formulaire parent de la liste déroulante modifiée
+        var url = form.attr('action'); // Récupère l'URL de l'action du formulaire
+        var formData = form.serialize(); // Sérialise les données du formulaire
+
+        // Effectue une requête GET au serveur avec les données du formulaire
+        $.get(url, formData, function(response) {
+            // Met à jour le contenu du tableau avec la réponse de la requête
+            $('#myTable tbody').html(response);
+        });
+    });
+
+
        $("#compteBtn").click(function () {
            $("#menuDropdown").toggle(); // Afficher ou masquer la liste déroulante
 
 
        });
+
+       // remplissage de la liste des localisation
+       $.getJSON('{{ route("obtenir-localisation") }}')
+       .done(function (donnees,stat,hxr){
+            console.log("ok");
+            $.each(donnees, function (index, ligne) {
+                    // ligne contient un objet json de la forme
+                    // {"idRegion" : "id de la region"},
+                    // {"nomRegion" : "nom de la region"}                 
+                    $("#satellite").append($('<option>', {value: ligne.GDE_DEPOT}).text(ligne.GDE_LIBELLE));
+            });
+
+        })
+        // remplissage de la liste des categorie
+       $.getJSON('{{ route("obtenir-categorie") }}')
+       .done(function (donnees,stat,hxr){
+            console.log("ok");
+            $.each(donnees, function (index, ligne) {
+                    // ligne contient un objet json de la forme
+                    // {"idRegion" : "id de la region"},
+                    // {"nomRegion" : "nom de la region"}                 
+                    $("#categorie").append($('<option>', {value: ligne.GA_CODEARTICLE}).text(ligne.GA_FAMILLENIV1));
+                    $("#sous_categorie1").append($('<option>', {value: ligne.GA_CODEARTICLE}).text(ligne.GA_FAMILLENIV2));
+                    $("#sous_categorie2").append($('<option>', {value: ligne.GA_CODEARTICLE}).text(ligne.GA_FAMILLENIV3));
+            });
+
+        })
+
+
+
+
+        
+
+        .fail(function (xhr,text,error){
+            console.log("param :"+JSON.stringify(hxr));
+        });
 
 
        // Initialisation de DataTables avec des options de filtre
@@ -148,14 +200,14 @@ color: red;
 
    var allSelected = false;
 
-function individuel(element) {
-if (element.classList.contains('selected')) {
-element.classList.remove('selected');
-element.innerHTML = "&square;"; // Réinitialise le carré à sa forme originale
-} else {
-element.classList.add('selected');
-element.innerHTML = "<span class='pourcroix'>&#10005;</span>"; // Affiche une croix rouge lorsqu'il est sélectionné
-}
+   function individuel(element) {
+    if ($(element).hasClass('selected')) {
+        $(element).removeClass('selected');
+        $(element).html("&square;");
+    } else {
+        $(element).addClass('selected');
+        $(element).html("<span class='pourcroix'>&#10005;</span>");
+    }
 }
 
 function selectAll() {
@@ -171,6 +223,13 @@ square.innerHTML = "&square;"; // Réinitialise chaque carré à sa forme d'orig
 }
 });
 }
+
+
+
+
+
+
+
 
 
 

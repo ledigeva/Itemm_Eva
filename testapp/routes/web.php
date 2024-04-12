@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/toto',[BlogController::class,'afficher'])->name('toto');
+Route::get('/toto',[BlogController::class,'obtenirInformationVueBarre'])->name('toto');
 
 Route::get('genepdf', [PdfBarreController::class, 'generatePdf'])->name('genepdf');
 Route::get('genepdfqrcode', [QrCodeController::class, 'pdfqrcode', 'generateQRCode'])->name('genepdfqrcode');
@@ -62,10 +62,13 @@ Route::get('/stocks', function () {
 })->name('stocks');
 
 // generer qr code
-Route::get('/qrcode', [QrCodeController::class,"obtenirInformation"])->name('qrcode');
+Route::get('/qrcode', [QrCodeController::class,"obtenirInformationTableau"])->name('qrcode');
 
 
 // generer code barre
 //Route::get('/barre', function () {
 //    return view('barre');
 //})->name('barre');
+Route::get('/obtenir-localisation', [QrCodeController::class, 'obtenirLocalisation'])->name('obtenir-localisation');
+Route::get('/obtenir-categorie', [QrCodeController::class, 'obtenirCategorie'])->name('obtenir-categorie');
+
