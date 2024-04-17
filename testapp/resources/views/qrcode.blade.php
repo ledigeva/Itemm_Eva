@@ -20,46 +20,44 @@ color: red;
 <div class="container">
        <h1>QRCode</h1>
        <!-- Formulaire de filtre -->
-       <div class="pourfiltre col-md-12 mb-4 d-flex justify-content-center"> <!-- Added flex class -->
+       <div class="row">
 
-
-           <!-- satelllite -->
-           <form id="satelliteForm" action="{{ route('qrcode') }}" method="GET" class="col-md-3 border border-dark">
-             @csrf
+       
+        
+        <!-- satelllite -->
+            <form id="satelliteForm" action="{{ route('qrcode') }}" method="GET" class="row border border-dark">
+            <div class="col-md-3">
+            @csrf
              <select name="satellite" id="satellite" class="form-select">
              <option value="-1">Sélectionnez une localisation</option>
              </select>
-           </form>
+        </div>
 
-
+           
+          
+        <div class="col-md-3">
            <!-- catégorie -->
-           <form id="categorieForm" action="{{ route('qrcode') }}" method="GET" class="col-md-3 border border-dark">
-               @csrf
+              
                <select name="categorie" id="categorie"class="form-select">
                <option value="-1">Sélectionnez une Categorie</option>
                </select>
-           </form>
+               </div>
 
 
-
-
+               <div class="col-md-3">
            <!-- sous-catégorie 1 -->
-           <form id="sousCategorie1Form" action="{{ route('qrcode') }}" method="GET" class="col-md-3 border border-dark">
-               @csrf
                <select name="sous_categorie1" id="sous_categorie1"class="form-select">
                <option value="-1">Sélectionnez une Sous-Categorie 1</option>
                </select>
-           </form>
+               </div>
 
 
-
-
+               <div class="col-md-3">
            <!-- sous-catégorie 2 -->
-           <form id="sousCategorie2Form" action="{{ route('qrcode') }}" method="GET" class="col-md-3 border border-dark">
-               @csrf
                <select name="sous_categorie2" id="sous_categorie2"class="form-select">
                <option value="-1">Sélectionnez une Sous-Categorie 2</option>
                </select>
+               </div>
            </form>
        </div>
    </div>
@@ -126,11 +124,22 @@ color: red;
 
 
 <script>
-   // JavaScript pour afficher ou masquer la liste déroulante au clic sur l'image de compte
-   $(document).ready(function () {
-
-     // Attend que le document soit entièrement chargé
-     $('select').change(function() {
+    var leDataTable=new DataTable('#myTable');
+    function mettreAJourTableau()
+    {
+        console.log("maj table");
+        
+// detruire le datatable
+        leDataTable.destroy();
+        $('#myTable').empty();
+        // Initialisation de DataTables avec des options de filtre
+        leDataTable=new DataTable('#myTable');
+        leDataTable.settings().init({
+           "paging": true, // Activer la pagination
+           "searching": true, // Activer la recherche
+           "ordering": true, // Activer le tri
+           "info": true // Afficher les informations sur la pagination
+       }).draw();
         // Sélectionne toutes les listes déroulantes et ajoute un écouteur d'événements change
         var form = $(this).closest('form'); // Trouve le formulaire parent de la liste déroulante modifiée
         var url = form.attr('action'); // Récupère l'URL de l'action du formulaire
@@ -141,16 +150,10 @@ color: red;
             // Met à jour le contenu du tableau avec la réponse de la requête
             $('#myTable tbody').html(response);
         });
-    });
-
-
-       $("#compteBtn").click(function () {
-           $("#menuDropdown").toggle(); // Afficher ou masquer la liste déroulante
-
-
-       });
-
-       // remplissage de la liste des localisation
+    }
+    function remplirListeLocalisation()
+    {
+         // remplissage de la liste des localisation
        $.getJSON('{{ route("obtenir-localisation") }}')
        .done(function (donnees,stat,hxr){
             console.log("ok");
@@ -162,6 +165,23 @@ color: red;
             });
 
         })
+    }
+   // JavaScript pour afficher ou masquer la liste déroulante au clic sur l'image de compte
+   $(document).ready(function () {
+
+     // Attend que le document soit entièrement chargé
+     $('select').change(mettreAJourTableau);
+
+
+       $("#compteBtn").click(function () {
+           $("#menuDropdown").toggle(); // Afficher ou masquer la liste déroulante
+
+
+       });
+
+      remplirListeLocalisation();
+
+        
         // remplissage de la liste des categorie
        $.getJSON('{{ route("obtenir-categorie") }}')
        .done(function (donnees,stat,hxr){
@@ -188,14 +208,19 @@ color: red;
 
 
        // Initialisation de DataTables avec des options de filtre
-       $('#myTable').DataTable({
+       /*leDataTable=$('#myTable').DataTable({
            "paging": true, // Activer la pagination
            "searching": true, // Activer la recherche
            "ordering": true, // Activer le tri
            "info": true // Afficher les informations sur la pagination
-       });
+       });*/
 
-
+       leDataTable.settings().init({
+           "paging": true, // Activer la pagination
+           "searching": true, // Activer la recherche
+           "ordering": true, // Activer le tri
+           "info": true // Afficher les informations sur la pagination
+       }).draw();
    });
 
    var allSelected = false;

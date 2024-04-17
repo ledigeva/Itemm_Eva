@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticleSatelliteController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\GenerateInvoiceController;
 use App\Http\Controllers\PdfBarreController;
@@ -61,8 +62,18 @@ Route::get('/stocks', function () {
     return view('stocks');
 })->name('stocks');
 
+// articlesatellite
+Route::get('/articleparsatellite', [ArticleSatelliteController::class,"obtenirInformationListe"])->name('articleparsat');
+Route::get ('diagram', [ArticleSatelliteController::class, "obtenriDiagram" ])->name ('diagram');
+
+// repartitionarticles
+Route::get('/repartition', function () {
+    return view('repartitionarticles');
+})->name('repartition');
+
 // generer qr code
 Route::get('/qrcode', [QrCodeController::class,"obtenirInformationTableau"])->name('qrcode');
+
 
 
 // generer code barre
@@ -71,4 +82,6 @@ Route::get('/qrcode', [QrCodeController::class,"obtenirInformationTableau"])->na
 //})->name('barre');
 Route::get('/obtenir-localisation', [QrCodeController::class, 'obtenirLocalisation'])->name('obtenir-localisation');
 Route::get('/obtenir-categorie', [QrCodeController::class, 'obtenirCategorie'])->name('obtenir-categorie');
+
+
 
