@@ -83,5 +83,6 @@ Route::get('/qrcode', [QrCodeController::class,"obtenirInformationTableau"])->na
 Route::get('/obtenir-localisation', [QrCodeController::class, 'obtenirLocalisation'])->name('obtenir-localisation');
 Route::get('/obtenir-categorie', [QrCodeController::class, 'obtenirCategorie'])->name('obtenir-categorie');
 
-
+Route::get('/obtenir-sous-categorie/{idCategorie}', [QrCodeController::class, 'obtenirSousCategorie'])->name('obtenir-sous-categorie');
+Route::get('/obtenir-sous-categorie2/{idCategorie2}', [QrCodeController::class, 'obtenirSousCategorie2'])->name('obtenir-sous-categorie2');
 

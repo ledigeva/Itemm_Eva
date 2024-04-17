@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Choix_Cat;
 use App\Models\Depots;
 use App\Models\Articles;
 use App\Models\Dispos;
@@ -25,27 +26,39 @@ class QrCodeController extends Controller
 
     public function obtenirCategorie()
     {
-        $cat=Articles::all();
+        $cat=Choix_Cat::all()->where('CC_TYPE','FN1');
         return $cat;
     }
     public function obtenirSousCategorie($idCategorie)
     {
 
-        $souscat = DB::select('SELECT * FROM choix_cat WHERE cc_code IN (SELECT DISTINCT GA_Familleniv2 FROM articles WHERE GA_FAMILLENIV1="$idCategorie")');
+/*	    dd($idCategorie);
+	    die();
+ */
+        //$souscat = DB::select('SELECT * FROM choix_cat WHERE cc_code IN (SELECT DISTINCT GA_Familleniv2 FROM articles WHERE GA_FAMILLENIV1="$idCategorie")', [$idCategorie]);
+        
+        $souscat = Choix_Cat::whereIn('cc_code', function($query) use ($idCategorie) {
+            $query->select('GA_Familleniv2')
+                ->distinct()
+                ->from('articles')
+                ->where('GA_FAMILLENIV1', $idCategorie);
+        })->get();
+        return $souscat;
 
-        /*
-        select * from choix_cat where cc_code in (select distinct GA_Familleniv2 from articles where GA_FAMILLENIV1="$idCategorie");
-        */
     }
     public function obtenirSousCategorie2($idCategorie2)
     {
 
-        $souscatt = DB::select('SELECT * FROM choix_cat WHERE cc_code IN (SELECT DISTINCT GA_Familleniv3 FROM articles WHERE GA_FAMILLENIV2="$idCategorie"');
-    
+        //$souscatt = DB::select('SELECT * FROM choix_cat WHERE cc_code IN (SELECT DISTINCT GA_Familleniv3 FROM articles WHERE GA_FAMILLENIV2="$idCategorie"');
+        
+        $souscatt = Choix_Cat::whereIn('cc_code', function($query) use ($idCategorie2) {
+            $query->select('GA_Familleniv3')
+                ->distinct()
+                ->from('articles')
+                ->where('GA_FAMILLENIV2', $idCategorie2);
+        })->get();
 
-        /*
-        select * from choix_cat where cc_code in (select distinct GA_Familleniv3 from articles where GA_FAMILLENIV2="$idCategorie");
-        */
+        return $souscatt;
     }
 
 
@@ -69,9 +82,13 @@ class QrCodeController extends Controller
         ->join('articles', 'dispos.GQ_ARTICLE', '=', 'articles.GA_CODEARTICLE')
         ->join('depots', 'dispos.GQ_DEPOT', '=', 'depots.GDE_DEPOT');
 
+
         //satellite
     if ($request->filled('satellite')) {
         $query->where('depots.GDE_LIBELLE', $request->input('satellite'));
+
+        $cat=Choix_Cat::all()->where('CC_TYPE','FN1');
+        return $cat;
     }
 
     //categorie
@@ -105,6 +122,7 @@ class QrCodeController extends Controller
         return $pdf->download();
 
     }
+
 
     public function generateQrCode() 
     {

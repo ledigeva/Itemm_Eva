@@ -67,6 +67,7 @@ color: red;
 <!-- Tableau dynamique -->
 <div class="container">
     <table id="myTable">
+
         <thead>
             <tr>
                 <th>id de la ligne invisible</th>
@@ -125,6 +126,7 @@ color: red;
 
 <script>
     var leDataTable=new DataTable('#myTable');
+    
     function mettreAJourTableau()
     {
         console.log("maj table");
@@ -151,9 +153,13 @@ color: red;
             $('#myTable tbody').html(response);
         });
     }
+
+
+
     function remplirListeLocalisation()
     {
          // remplissage de la liste des localisation
+
        $.getJSON('{{ route("obtenir-localisation") }}')
        .done(function (donnees,stat,hxr){
             console.log("ok");
@@ -163,15 +169,76 @@ color: red;
                     // {"nomRegion" : "nom de la region"}                 
                     $("#satellite").append($('<option>', {value: ligne.GDE_DEPOT}).text(ligne.GDE_LIBELLE));
             });
+        })
+    }
+
+    function remplirCategorie()
+    {
+    // remplissage de la liste des categorie
+
+    $.getJSON('{{ route("obtenir-categorie") }}')
+       .done(function (donnees,stat,hxr){
+            console.log("ok");
+            $.each(donnees, function (index, ligne) {
+                    // ligne contient un objet json de la forme
+                    // {"idRegion" : "id de la region"},
+                    // {"nomRegion" : "nom de la region"}                 
+                    $("#categorie").append($('<option>', {value: ligne.CC_CODE}).text(ligne.CC_LIBELLE));
+            });
 
         })
     }
+
+    function remplirSouscat()
+    {
+    // remplissage de la liste des categorie
+    var idCat=$(this).val();
+    console.log("remplir sous cat pour cat : "+idCat);
+    
+    $.getJSON('obtenir-sous-categorie/'+idCat )
+       .done(function (donnees,stat,hxr){
+            console.log("ok");
+            $.each(donnees, function (index, ligne) {
+                 
+                    $("#sous_categorie1").append($('<option>', {value: ligne.CC_CODE}).text(ligne.CC_LIBELLE));
+            });
+
+        })
+        .fail(function (xhr,text,error){
+            console.log("param :"+JSON.stringify(hxr));
+        });
+    }
+
+
+
+
+    function remplirSouscat2()
+    {
+    // remplissage de la liste des categorie
+    var idCat=$(this).val();
+    console.log("remplir sous cat 2 pour cat : "+idCat);
+
+    $.getJSON('obtenir-sous-categorie2/'+idCat)
+       .done(function (donnees,stat,hxr){
+            console.log("ok");
+            $.each(donnees, function (index, ligne) {
+                                   
+                    $("#sous_categorie2").append($('<option>', {value: ligne.CC_CODE}).text(ligne.CC_LIBELLE));
+            });
+
+        })
+        .fail(function (xhr,text,error){
+            console.log("param :"+JSON.stringify(hxr));
+    });
+    }
+
+    
    // JavaScript pour afficher ou masquer la liste déroulante au clic sur l'image de compte
    $(document).ready(function () {
 
      // Attend que le document soit entièrement chargé
-     $('select').change(mettreAJourTableau);
-
+     //$('select').change(mettreAJourTableau);
+    $("#categorie").change(remplirSouscat);
 
        $("#compteBtn").click(function () {
            $("#menuDropdown").toggle(); // Afficher ou masquer la liste déroulante
@@ -180,31 +247,19 @@ color: red;
        });
 
       remplirListeLocalisation();
+      remplirCategorie();
+      remplirSouscat();
+      remplirSouscat2();
 
         
-        // remplissage de la liste des categorie
-       $.getJSON('{{ route("obtenir-categorie") }}')
-       .done(function (donnees,stat,hxr){
-            console.log("ok");
-            $.each(donnees, function (index, ligne) {
-                    // ligne contient un objet json de la forme
-                    // {"idRegion" : "id de la region"},
-                    // {"nomRegion" : "nom de la region"}                 
-                    $("#categorie").append($('<option>', {value: ligne.GA_CODEARTICLE}).text(ligne.GA_FAMILLENIV1));
-                    $("#sous_categorie1").append($('<option>', {value: ligne.GA_CODEARTICLE}).text(ligne.GA_FAMILLENIV2));
-                    $("#sous_categorie2").append($('<option>', {value: ligne.GA_CODEARTICLE}).text(ligne.GA_FAMILLENIV3));
-            });
-
-        })
+        
 
 
 
 
         
 
-        .fail(function (xhr,text,error){
-            console.log("param :"+JSON.stringify(hxr));
-        });
+        
 
 
        // Initialisation de DataTables avec des options de filtre
