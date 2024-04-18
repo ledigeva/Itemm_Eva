@@ -172,9 +172,9 @@ color: red;
         })
     }
 
+
     function remplirCategorie()
     {
-    // remplissage de la liste des categorie
 
     $.getJSON('{{ route("obtenir-categorie") }}')
        .done(function (donnees,stat,hxr){
@@ -188,6 +188,19 @@ color: red;
 
         })
     }
+
+    // Permet de rignitialiser de sous cat 1 a chaque fois que je change categorie
+
+    document.getElementById("categorie").addEventListener("change", function() {
+    // Récupérer l'élément de la liste déroulante de sous-catégories
+    var selectElement = document.getElementById("sous_categorie1");
+    
+    // Supprimer tous les éléments enfants, sauf le premier
+    while (selectElement.children.length > 1) {
+        selectElement.removeChild(selectElement.children[1]);
+    }
+});
+
 
     function remplirSouscat()
     {
@@ -209,7 +222,17 @@ color: red;
         });
     }
 
+        // Permet de rignitialiser sous cat 2 a chaque fois que je change d'sous cat 1
 
+        document.getElementById("sous_categorie1").addEventListener("change", function() {
+    // Récupérer l'élément de la liste déroulante de sous-catégories
+    var selectElement = document.getElementById("sous_categorie2");
+    
+    // Supprimer tous les éléments enfants, sauf le premier
+    while (selectElement.children.length > 1) {
+        selectElement.removeChild(selectElement.children[1]);
+    }
+});
 
 
     function remplirSouscat2()
@@ -250,17 +273,6 @@ color: red;
       remplirCategorie();
       remplirSouscat();
       remplirSouscat2();
-
-        
-        
-
-
-
-
-        
-
-        
-
 
        // Initialisation de DataTables avec des options de filtre
        /*leDataTable=$('#myTable').DataTable({
@@ -303,18 +315,6 @@ square.innerHTML = "&square;"; // Réinitialise chaque carré à sa forme d'orig
 }
 });
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 </script>
 
